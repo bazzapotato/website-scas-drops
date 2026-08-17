@@ -11,7 +11,6 @@
 </head>
 <body>
 
-  <!-- Top Sticky Header -->
   <header class="site-header">
     <div class="header-left">
       <a href="#" class="brand-title">SCAS DROPS</a>
@@ -23,7 +22,6 @@
     </div>
   </header>
 
-  <!-- Filter & Search Toolbar -->
   <section class="toolbar">
     <div class="filter-group">
       <button class="filter-btn active" data-filter="all">ALL (<span id="countAll">0</span>)</button>
@@ -37,33 +35,22 @@
     </div>
   </section>
 
-  <!-- Drops Grid Container -->
-  <main class="grid-container" id="dropsGrid">
-    <!-- Drops dynamically injected via JS/App.js -->
-  </main>
+  <main class="grid-container" id="dropsGrid"></main>
 
-  <!-- Drop Detail Modal -->
   <div class="modal-overlay" id="dropModal">
     <div class="modal-content">
       <button class="modal-close" id="modalCloseBtn">&times;</button>
-      <div class="modal-body" id="modalBody">
-        <!-- Injected via JavaScript -->
-      </div>
+      <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="site-footer">
     <p>&copy; <span id="currentYear"></span> SCAS DROPS. ALL RIGHTS RESERVED.</p>
   </footer>
 
-  <!-- Scripts -->
- 
-  <script src="JS/drops/"></script>
-
-
-  <!-- Main Render Engine -->
-  <script src="JS/App.js?v=2"></script>
+  <!-- Only App.js is required -->
+  <script src="JS/App.js"></script>
 </body>
 </html>
+
 
