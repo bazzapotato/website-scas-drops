@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const dropsGrid = document.getElementById("dropsGrid");
   const filterBtns = document.querySelectorAll(".filter-btn");
   const searchInput = document.getElementById("searchInput");
@@ -8,24 +8,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalBody = document.getElementById("modalBody");
   const modalCloseBtn = document.getElementById("modalCloseBtn");
   const currentYearSpan = document.getElementById("currentYear");
-  // Sorts automatically so the highest ID (newest drop) appears first
-  const dropsData = (window.DROPS_DATA || []).slice().sort((a, b) => b.id - a.id);
 
   if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
+
+  let dropsData = [];
+
+  try {
+    const res = await fetch("drops.json");
+    if (!res.ok) throw new Error("Failed to load drops.json");
+    dropsData = await res.json();
+  } catch (err) {
+    console.error("Error loading drops.json:", err);
+  }
 
   let activeFilter = "all";
   let searchQuery = "";
 
-  // Render all drops
   function renderDrops() {
     dropsGrid.innerHTML = "";
 
-    const filtered = DROPS_DATA.filter((drop) => {
-      const matchesFilter = activeFilter === "all" || drop.status === activeFilter;
+    const filtered = dropsData.filter((drop) => {
+      const matchesFilter = activeFilter === "all" || drop.status.toLowerCase() === activeFilter.toLowerCase();
       const matchesSearch =
         drop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        drop.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        drop.dropNumber.includes(searchQuery);
+        (drop.tagline && drop.tagline.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        String(drop.dropNumber).includes(searchQuery);
       return matchesFilter && matchesSearch;
     });
 
@@ -39,25 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     filtered.forEach((drop) => {
-      const card = createDropCard(drop);
-      dropsGrid.appendChild(card);
+      dropsGrid.appendChild(createDropCard(drop));
     });
 
     startCountdownTimers();
   }
 
-  // Create single drop card element
   function createDropCard(drop) {
     const card = document.createElement("article");
     card.className = "drop-card";
 
-    const badgeLabel = drop.status.replace("_", " ");
+    const badgeLabel = (drop.status || "").replace("_", " ");
     const repeatedTitle = `${drop.title.toUpperCase()} • `.repeat(8);
 
     card.innerHTML = `
       <div class="card-header">
         <span class="drop-number"># ${drop.dropNumber}</span>
-        <span class="drop-badge badge-${drop.status}">${badgeLabel}</span>
+        <span class="drop-badge badge-${drop.status.toLowerCase()}">${badgeLabel}</span>
       </div>
       <div class="card-media" onclick="openDropModal(${drop.id})">
         <img src="${drop.image}" alt="${drop.title}" class="card-image" loading="lazy">
@@ -68,23 +73,22 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="card-body">
         <div>
           <h2 class="drop-title">${drop.title}</h2>
-          <p class="drop-tagline">${drop.tagline}</p>
+          <p class="drop-tagline">${drop.tagline || ""}</p>
           ${
-            drop.status === "upcoming"
+            drop.status.toLowerCase() === "upcoming" && drop.releaseDate && drop.releaseDate !== "TBA"
               ? `<div class="countdown-timer" data-release="${drop.releaseDate}">DROPPING IN: --:--:--</div>`
               : ""
           }
         </div>
         <div class="card-footer">
           <span class="drop-price">${drop.price || ""}</span>
-          <a href="${drop.link}" target="_blank" rel="noopener" class="drop-action-btn">${drop.buttonText}</a>
+          <a href="${drop.link || '#'}" target="_blank" rel="noopener" class="drop-action-btn">${drop.buttonText || 'View'}</a>
         </div>
       </div>
     `;
     return card;
   }
 
-  // Live Countdown logic
   function startCountdownTimers() {
     const timers = document.querySelectorAll(".countdown-timer");
 
@@ -111,19 +115,18 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(update, 1000);
   }
 
-  // Modal logic
   window.openDropModal = function(id) {
-    const drop = DROPS_DATA.find((d) => d.id === id);
+    const drop = dropsData.find((d) => d.id === id);
     if (!drop) return;
 
     modalBody.innerHTML = `
       <div style="margin-bottom: 14px; font-weight: bold; font-size: 1.1rem;"># ${drop.dropNumber} // ${drop.status.toUpperCase()}</div>
       <img src="${drop.image}" alt="${drop.title}" style="width: 100%; border: 2px solid var(--border-color); margin-bottom: 16px;">
       <h2 style="font-family: var(--font-display); font-size: 1.6rem; margin-bottom: 8px;">${drop.title}</h2>
-      <p style="margin-bottom: 16px; line-height: 1.5; font-size: 0.95rem;">${drop.description}</p>
+      <p style="margin-bottom: 16px; line-height: 1.5; font-size: 0.95rem;">${drop.description || ""}</p>
       <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--border-color); padding-top: 16px;">
-        <span style="font-size: 1.2rem; font-weight: bold;">${drop.price}</span>
-        <a href="${drop.link}" target="_blank" rel="noopener" class="drop-action-btn">${drop.buttonText}</a>
+        <span style="font-size: 1.2rem; font-weight: bold;">${drop.price || ""}</span>
+        <a href="${drop.link || '#'}" target="_blank" rel="noopener" class="drop-action-btn">${drop.buttonText || 'View'}</a>
       </div>
     `;
     modal.classList.add("active");
@@ -134,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) modal.classList.remove("active");
   });
 
-  // Filter handlers
   filterBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       filterBtns.forEach((b) => b.classList.remove("active"));
@@ -144,20 +146,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Search handler
   searchInput.addEventListener("input", (e) => {
     searchQuery = e.target.value;
     renderDrops();
   });
 
-  // Contrast toggle
   themeToggle.addEventListener("click", () => {
     const currentTheme = document.documentElement.getAttribute("data-theme");
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", nextTheme);
   });
 
-  // Initial count & render
-  if (countAll) countAll.textContent = DROPS_DATA.length;
+  if (countAll) countAll.textContent = dropsData.length;
   renderDrops();
+});
+
 });
