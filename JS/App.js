@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalBody = document.getElementById("modalBody");
   const modalCloseBtn = document.getElementById("modalCloseBtn");
   const currentYearSpan = document.getElementById("currentYear");
+  // Sorts automatically so the highest ID (newest drop) appears first
+  const dropsData = (window.DROPS_DATA || []).slice().sort((a, b) => b.id - a.id);
 
   if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
 
