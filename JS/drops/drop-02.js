@@ -1,14 +1,12 @@
-window.DROPS_DATA = window.DROPS_DATA || [];
-window.DROPS_DATA.push({
+module.exports = {
   id: 2,
   dropNumber: "02",
   title: "LIMITED DROP 01 XX/50",
-  status: "TBA",
-  releaseDate: "TBA",
-  price: "",
-  image: "~/JS/drops/image" "02.png",
+  status: "upcoming",
+  releaseDate: "2026-10-01T12:00:00",
+  price: "TBA",
   tagline: "limited edition, new style",
-  description: "Custom collectors peice ",
-  buttonText: "coming soon",
+  description: "Custom collectors piece",
+  buttonText: "Coming Soon",
   link: "#"
-});
+};
