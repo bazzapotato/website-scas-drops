@@ -6,7 +6,7 @@ window.DROPS_DATA.push({
     status: "archived",
     releaseDate: "2022-03-24",
     price: 
-    image: "https://" + ["images", "unsplash", "com"].join(".") + "/" + "photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+    image: "~/JS/Drops/image" "01.jpg"
     tagline: "collaborative gallery event",
     description: "A collection of personal works shown at playstate supply in newcastle west (now in islington)",
     buttonText: "View Archive ↗",
