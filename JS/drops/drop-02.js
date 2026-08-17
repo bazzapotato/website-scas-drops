@@ -6,7 +6,7 @@ window.DROPS_DATA.push({
   status: "TBA",
   releaseDate: "TBA",
   price: "",
-  image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
+  image: "~/JS/drops/image" "02.png",
   tagline: "limited edition, new style",
   description: "Custom collectors peice ",
   buttonText: "coming soon",
