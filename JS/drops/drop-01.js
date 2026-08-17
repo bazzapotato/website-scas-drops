@@ -1,6 +1,6 @@
 module.exports = {
   id: 1,
-  dropNumber: "01",
+  dropNumber: "00",
   title: "group gallery @ playstate newy west",
   status: "archived",
   releaseDate: "2022-03-24",
