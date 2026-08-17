@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAW // DIRECTIVE MATRIX</title>
+  <style>
+    :root {
+      --bg: #f0f0f0;
+      --fg: #000000;
+      --accent: #ffff00;
+      --danger: #ff3333;
+      --border: 3px solid #000000;
+      --shadow: 5px 5px 0px #000000;
+      --font: 'Courier New', Courier, monospace, monospace;
+    }
+
+    .inverted {
+      --bg: #000000;
+      --fg: #ffffff;
+      --accent: #ff00ff;
+      --danger: #ff5555;
+      --border: 3px solid #ffffff;
+      --shadow: 5px 5px 0px #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      line-height: 1.4;
+      padding: 24px;
+      transition: background-color 0.1s;
+    }
+
+    header {
+      border: var(--border);
+      background: var(--bg);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .status-bar {
+      font-size: 0.9rem;
+      font-weight: bold;
+      background: var(--accent);
+      color: #000000;
+      padding: 4px 8px;
+      border: 2px solid #000000;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      background: var(--bg);
+      color: var(--fg);
+      border: var(--border);
+      box-shadow: 3px 3px 0px var(--fg);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--accent);
+      color: #000000;
+    }
+
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--fg);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      border: var(--border);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      background: var(--bg);
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      border-bottom: var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"], textarea {
+      font-family: var(--font);
+      font-size: 1rem;
+      width: 100%;
+      padding: 10px;
+      border: var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    ul.directive-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .directive-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid var(--fg);
+      padding: 8px 12px;
+      background: var(--bg);
+    }
+
+    .directive-item.completed {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .action-btn {
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      margin-left: 6px;
+    }
+
+    .danger-btn:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    footer {
+      margin-top: 24px;
+      border: var(--border);
+      padding: 12px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>SYS // DIRECTIVE_CORE</h1>
+      <p style="font-size: 0.85rem;">STARK INTERACTION & DATA MATRIX</p>
+    </div>
+    <div class="controls">
+      <span class="status-bar" id="live-clock">00:00:00 UTC</span>
+      <button id="toggle-theme">INVERT</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel">
+      <div class="panel-title">
+        <span>01. DIRECTIVE LOG</span>
+        <span id="directive-count">[0]</span>
+      </div>
+      <div class="input-row">
+        <input type="text" id="directive-input" placeholder="ENTER NEW DIRECTIVE...">
+        <button id="add-directive">LOG</button>
+      </div>
+      <ul class="directive-list" id="directive-list"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <span>02. SCRATCH BUFFER</span>
+        <button id="clear-buffer" class="action-btn danger-btn">PURGE</button>
+      </div>
+      <textarea id="buffer-area" placeholder="RAW TEXT INPUT AREA..."></textarea>
+      <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.8rem;" id="char-count">0 CHARS</span>
+        <button id="export-btn">EXPORT RAW</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>RUNTIME: CLIENT-SIDE LOCAL</span>
+    <span>AESTHETIC: HARDWARE BRUTALISM</span>
+  </footer>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').textContent = now.toISOString().slice(11, 19) + ' UTC';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    const themeBtn = document.getElementById('toggle-theme');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('inverted');
+    });
+
+    const directiveInput = document.getElementById('directive-input');
+    const addBtn = document.getElementById('add-directive');
+    const directiveList = document.getElementById('directive-list');
+    const directiveCount = document.getElementById('directive-count');
+
+    let directives = JSON.parse(localStorage.getItem('brutalist_directives') || '[]');
+
+    function saveAndRender() {
+      localStorage.setItem('brutalist_directives', JSON.stringify(directives));
+      directiveList.innerHTML = '';
+      directives.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'directive-item' + (item.done ? ' completed' : '');
+        
+        const textSpan = document.createElement('span');
+        textSpan.textContent = `[${index + 1}] ${item.text}`;
+        textSpan.style.cursor = 'pointer';
+        textSpan.addEventListener('click', () => {
+          directives[index].done = !directives[index].done;
+          saveAndRender();
+        });
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'action-btn danger-btn';
+        delBtn.textContent = 'DEL';
+        delBtn.addEventListener('click', () => {
+          directives.splice(index, 1);
+          saveAndRender();
+        });
+
+        li.appendChild(textSpan);
+        li.appendChild(delBtn);
+        directiveList.appendChild(li);
+      });
+      directiveCount.textContent = `[${directives.length}]`;
+    }
+
+    addBtn.addEventListener('click', () => {
+      const text = directiveInput.value.trim();
+      if (text) {
+        directives.push({ text, done: false });
+        directiveInput.value = '';
+        saveAndRender();
+      }
+    });
+
+    directiveInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addBtn.click();
+    });
+
+    saveAndRender();
+
+    const bufferArea = document.getElementById('buffer-area');
+    const charCount = document.getElementById('char-count');
+    const clearBtn = document.getElementById('clear-buffer');
+    const exportBtn = document.getElementById('export-btn');
+
+    bufferArea.value = localStorage.getItem('brutalist_buffer') || '';
+    charCount.textContent = `${bufferArea.value.length} CHARS`;
+
+    bufferArea.addEventListener('input', () => {
+      localStorage.setItem('brutalist_buffer', bufferArea.value);
+      charCount.textContent = `${bufferArea.value.length} CHARS`;
+    });
+
+    clearBtn.addEventListener('click', () => {
+      bufferArea.value = '';
+      localStorage.removeItem('brutalist_buffer');
+      charCount.textContent = '0 CHARS';
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const blob = new Blob([bufferArea.value], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `RAW_BUFFER_${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
